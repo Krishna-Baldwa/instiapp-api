@@ -11,7 +11,8 @@ PERMISSION_CHOICES = (
     ('Role', 'Modify Roles'),
     ('VerA', 'Verify Achievements'),
     ('AppP', 'Moderate Post'),
-    ('ModC', 'Moderate Comment')
+    ('ModC', 'Moderate Comment'),
+    ('GCAdmin', 'GC Admin')
 )
 
 class BodyRole(models.Model):

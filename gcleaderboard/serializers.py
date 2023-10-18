@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from gcleaderboard.models import GC, GC_Hostel_Points
-
+from messmenu.serializers import HostelSerializer
 
 class GCSerializer(serializers.ModelSerializer):
+    participating_hostels = HostelSerializer(many=True, read_only=True)
     class Meta:
         model = GC
         fields = "__all__"

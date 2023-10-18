@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from django.db.models import Sum, Value
 from django.db.models.functions import Coalesce
 from rest_framework import viewsets
@@ -16,6 +17,11 @@ from .serializers import (
 
 from gcleaderboard.serializers import Participants_Serializer 
 
+def get_GC(gc_id):
+    """
+    Helper function to get GC object by ID. Returns None if not found.
+    """
+    return get_object_or_404(GC, id=gc_id)
 
 class InstiViewSet(viewsets.ModelViewSet):
     queryset = GC.objects
@@ -37,8 +43,9 @@ class InstiViewSet(viewsets.ModelViewSet):
     def Individual_GC_LB(self, request, gc_id):
         
         """ List Of Hostels sorted w.r.t points for leaderboard of that gc """
-        gc = GC_Hostel_Points.objects.filter(gc__id=gc_id).order_by("-points")
-        serializer = Hostel_PointsSerializer(gc, many=True)
+        gc = get_GC(gc_id)
+        gc_hostel_points = GC_Hostel_Points.objects.filter(gc=gc).order_by("-points")
+        serializer = Hostel_PointsSerializer(gc_hostel_points, many=True)
         return Response(serializer.data)
 
     
@@ -93,30 +100,35 @@ class InstiViewSet(viewsets.ModelViewSet):
 
 
 
-class PostViewSet(viewsets.ModelViewSet):
-    queryset = GC.objects.all()  #
+class GCAdminViewSet(viewsets.ModelViewSet):
+    queryset = GC.objects.all()
     serializer_class = GCSerializer
-    
+
     @login_required_ajax
     def add_GC(self, request):
         """ Adding New GC """
-        serializer = GCSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-        return Response(serializer.data)
+        if user_has_privilege(request.user.profile, 'GCAdmin'):
+            participating_hostels_data = request.data.get('participating_hostels', [])
+            serializer = GCSerializer(data=request.data)
+            if serializer.is_valid():
+                gc = serializer.save()
+
+                gc.participating_hostels.set(participating_hostels_data)
+                return Response(serializer.data)
+            return Response(serializer.errors, status=400)
+        return Response({"detail": "You do not have the required permissions to add GCs."}, status=403)
 
 
-
-class UpdateViewSet(viewsets.ModelViewSet):
+class GCAdminViewSet(viewsets.ModelViewSet):
     queryset = GC_Hostel_Points.objects.all()  # Replace with your queryset
     serializer_class = Hostel_Serializer
 
-    
     @login_required_ajax
-    def update_Points(self, request, pk):
-        """ Mpdify Hostel Points for a GC  """
-        hostel = GC_Hostel_Points.objects.get(id=pk)
-        change_point = int(request.data["points"])
-        hostel.points += change_point
-        hostel.save()
-        return Response({"message": "Points updated"})
+    def update_points(self, request, pk):
+        """ Modify Hostel Points for a GC """
+        if user_has_privilege(request.user.profile, 'GCAdmin'):
+            gc_hostel_points = get_object_or_404(GC_Hostel_Points, id=pk)    
+            change_point = int(request.data.get("points", 0))
+            gc_hostel_points.points += change_point
+            gc_hostel_points.save()
+            return Response({"message": "Points updated"})

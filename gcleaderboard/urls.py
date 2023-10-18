@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from gcleaderboard.views import InstiViewSet, PostViewSet, UpdateViewSet
+from gcleaderboard.views import InstiViewSet, GCAdminViewSet
 
 urlpatterns = [
    
@@ -40,7 +40,7 @@ urlpatterns = [
     ),
     path(
         "postGC",
-        PostViewSet.as_view(
+        GCAdminViewSet.as_view(
             {
                 "post": "add_GC",
             }
@@ -48,9 +48,9 @@ urlpatterns = [
     ),
     path(
         "updateGC/<pk>/",
-        UpdateViewSet.as_view(
+        GCAdminViewSet.as_view(
             {
-                "put": "update_Points",
+                "put": "update_points",
             }
         ),
     ),

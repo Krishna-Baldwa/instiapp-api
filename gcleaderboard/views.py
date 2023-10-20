@@ -108,7 +108,7 @@ class InstiViewSet(viewsets.ModelViewSet):
 
 
 
-class GCAdminViewSet(viewsets.ModelViewSet):
+class GCAdminPostViewSet(viewsets.ModelViewSet):
     queryset = GC.objects.all()
     serializer_class = GCSerializer
 

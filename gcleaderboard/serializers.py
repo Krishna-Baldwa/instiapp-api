@@ -8,6 +8,22 @@ class GCSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class TypeGCSerializer(serializers.ModelSerializer):
+
+    hostels  = serializers.SerializerMethodField()
+    gc = serializers.SerializerMethodField()
+
+    def get_gc(self, obj):
+        return obj.name
+
+    def get_hostels(self, obj):
+        return [obj.hostel.name for obj in GC_Hostel_Points.objects.filter(gc=obj).order_by("-points")[:3]]
+
+    class Meta:
+        model = GC_Hostel_Points
+        fields = ["gc", "hostels"]
+
+
 class Hostel_PointsSerializer(serializers.ModelSerializer):
     class Meta:
         model = GC_Hostel_Points

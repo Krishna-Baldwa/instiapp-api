@@ -14,6 +14,7 @@ from .serializers import (
     GCSerializer,
     Hostel_PointsSerializer,
     Hostel_Serializer,
+    TypeGCSerializer,
     
 )
 
@@ -40,9 +41,12 @@ class InstiViewSet(viewsets.ModelViewSet):
     serializer_class = GCSerializer
 
     def Type_GC(self,request,Type,):
-        """  List of GCs of a particular Type """
+        """GET list of GCs for a particular type.
+        As in list of all tech GCs, Cult GCs, etc.
+        This also has the first three rankers for every GC shown."""
+
         gcs = GC.objects.filter(type=Type)
-        serializer = GCSerializer(gcs, many=True)
+        serializer = TypeGCSerializer(gcs, many=True)
         return Response(serializer.data)
 
 
@@ -102,9 +106,6 @@ class InstiViewSet(viewsets.ModelViewSet):
         return Response(sorted_dict)
     
          
-
-
-
 
 class GCAdminPostViewSet(viewsets.ModelViewSet):
     queryset = GC.objects.all()

@@ -50,10 +50,10 @@ class InstiViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-    def Individual_GC_LB(self, request, gc_id):
-        
-        """ List Of Hostels sorted w.r.t points for leaderboard of that gc """
-        gc = get_GC(gc_id)
+    def Individual_GC_LB(self, request, pk):
+        """GET list of hostels for a particular GC ranked according to points."""
+
+        gc = GC.objects.get(id=pk)
         gc_hostel_points = GC_Hostel_Points.objects.filter(gc=gc).order_by("-points")
         serializer = Hostel_PointsSerializer(gc_hostel_points, many=True)
         return Response(serializer.data)

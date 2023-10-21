@@ -14,7 +14,7 @@ urlpatterns = [
     ),
 
     path(
-        "individualgclb/<gc_id>",
+        "individualgclb/<pk>/",
         InstiViewSet.as_view(
             {
                 "get": "Individual_GC_LB",

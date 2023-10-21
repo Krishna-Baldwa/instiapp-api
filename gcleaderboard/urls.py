@@ -42,7 +42,7 @@ urlpatterns = [
         "postGC",
         GCAdminPostViewSet.as_view(
             {
-                "post": "create",
+                "post": "add_GC",
             }
         ),
     ),

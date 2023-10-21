@@ -101,13 +101,6 @@ class InstiViewSet(viewsets.ModelViewSet):
         print(sorted_dict)
         return Response(sorted_dict)
     
-    # def Participants_in_GC(self ,  request , points_id ,hostel_short_name ):
-    #      participants = GC_Hostel_Points.objects.filter(
-    #             hostel__short_name=hostel_short_name, id = points_id
-    #         )
-         
-    #      serializer = Participants_Serializer(participants , many = True)
-    #      return Response(serializer.data)
          
 
 
@@ -131,9 +124,6 @@ class GCAdminPostViewSet(viewsets.ModelViewSet):
         if user_has_privilege(request.user.profile, request.data['body'], 'GCAdm'):
             gc = super().create(request)
             participating_hostel = request.data.getlist('participating_hostels')
-            print(request.data)
-            print(request.data['body'])
-            print(participating_hostel)
             for hostel in participating_hostel:
                 GC_Hostel_Points.objects.create(
                     gc=GC.objects.get(id=gc.data['id']),
@@ -143,15 +133,6 @@ class GCAdminPostViewSet(viewsets.ModelViewSet):
             return gc
         return forbidden_no_privileges()
 
-        #     serializer = GCSerializer(data=request.data)
-        #     if serializer.is_valid():
-        #         gc = serializer.save()
-
-        #         gc.participating_hostels.set(participating_hostels_data)
-        #         return Response(serializer.data)
-        #     return Response(serializer.errors, status=400)
-        # return Response({"detail": "You do not have the required permissions to add GCs."}, status=403)
-
 
 class GCAdminViewSet(viewsets.ModelViewSet):
     queryset = GC_Hostel_Points.objects.all()  # Replace with your queryset
@@ -159,9 +140,13 @@ class GCAdminViewSet(viewsets.ModelViewSet):
 
     @login_required_ajax
     def update_points(self, request, pk):
-        """ Modify Hostel Points for a GC """
-        if user_has_privilege(request.user.profile, 'GCAdmin'):
-            gc_hostel_points = get_object_or_404(GC_Hostel_Points, id=pk)    
+        """ Update points for a hostel in a GC.
+        Needs `GCAdm` permission for the body of the GC."""
+
+        gc = GC_Hostel_Points.objects.get(id=pk).gc
+
+        if user_has_privilege(request.user.profile, gc.body.id, 'GCAdm'):
+            gc_hostel_points = GC_Hostel_Points.objects.get(id=pk)
             change_point = int(request.data.get("points", 0))
             gc_hostel_points.points += change_point
             gc_hostel_points.save()

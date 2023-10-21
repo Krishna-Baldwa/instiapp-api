@@ -13,6 +13,7 @@ class GC(models.Model):
     name = models.CharField(max_length=50)
     type = models.PositiveIntegerField(choices=TYPE_CHOICES)
     participating_hostels = models.ManyToManyField(Hostel)
+    body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE, related_name='gc_body')
 
     def __str__(self):
         return self.name
@@ -23,8 +24,7 @@ class GC_Hostel_Points(models.Model):
     gc = models.ForeignKey(GC, on_delete=models.CASCADE)
     hostel = models.ForeignKey(Hostel, on_delete=models.CASCADE)
     points = models.IntegerField(default=0)
-    participants = models.ForeignKey('users.UserProfile', null=False,
-                             on_delete=models.CASCADE)
+    # participants = models.ForeignKey('users.UserProfile', null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         # Convert the UUID to a string representation before returning it

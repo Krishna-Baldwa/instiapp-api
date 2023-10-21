@@ -10,6 +10,13 @@ def forbidden_no_privileges():
         "detail": "You have insufficient priveleges to perform this action."
     }, status=403)
 
+def insufficient_parameters():
+    """Forbidden due to insufficient parameters."""
+    return Response({
+        "message": "insufficient paramters",
+        "detail": "You haven't sufficient parameters to perform this action."
+    }, status=403)
+
 def user_has_privilege(profile, bodyid, privilege):
     """Returns true if UserProfile has or has inherited the privilege."""
     body = Body.objects.get(pk=bodyid)

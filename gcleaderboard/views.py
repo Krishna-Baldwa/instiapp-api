@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from uuid import UUID
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum, Value
 from django.db.models.functions import Coalesce
@@ -7,7 +8,7 @@ from .models import GC, GC_Hostel_Points, Hostel
 from messmenu.serializers import HostelSerializer
 from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
-
+from roles.helpers import forbidden_no_privileges, insufficient_parameters
 from rest_framework.response import Response
 from .serializers import (
     GCSerializer,
@@ -18,23 +19,27 @@ from .serializers import (
 
 from gcleaderboard.serializers import Participants_Serializer 
 
-def get_GC(gc_id):
-    """
-    Helper function to get GC object by ID. Returns None if not found.
-    """
-    return get_object_or_404(GC, id=gc_id)
+def get_GC(self, pk):
+        """Get an event from pk uuid or strid."""
+        try:
+            UUID(pk, version=4)
+            return get_object_or_404(self.queryset, id=pk)
+        except ValueError:
+            return get_object_or_404(self.queryset, str_id=pk)
+        
+def get_GC_Hostel(self, pk):
+        """Get an event from pk uuid or strid."""
+        try:
+            UUID(pk, version=4)
+            return get_object_or_404(self.queryset, id=pk)
+        except ValueError:
+            return get_object_or_404(self.queryset, str_id=pk)
 
 class InstiViewSet(viewsets.ModelViewSet):
     queryset = GC.objects
     serializer_class = GCSerializer
-  
-   
 
-    def Type_GC(
-        self,
-        request,
-        Type,
-    ):
+    def Type_GC(self,request,Type,):
         """  List of GCs of a particular Type """
         gcs = GC.objects.filter(type=Type)
         serializer = GCSerializer(gcs, many=True)
@@ -96,13 +101,13 @@ class InstiViewSet(viewsets.ModelViewSet):
         print(sorted_dict)
         return Response(sorted_dict)
     
-    def Participants_in_GC(self ,  request , points_id ,hostel_short_name ):
-         participants = GC_Hostel_Points.objects.filter(
-                hostel__short_name=hostel_short_name, id = points_id
-            )
+    # def Participants_in_GC(self ,  request , points_id ,hostel_short_name ):
+    #      participants = GC_Hostel_Points.objects.filter(
+    #             hostel__short_name=hostel_short_name, id = points_id
+    #         )
          
-         serializer = Participants_Serializer(participants , many = True)
-         return Response(serializer.data)
+    #      serializer = Participants_Serializer(participants , many = True)
+    #      return Response(serializer.data)
          
 
 
@@ -112,19 +117,40 @@ class GCAdminPostViewSet(viewsets.ModelViewSet):
     queryset = GC.objects.all()
     serializer_class = GCSerializer
 
-    @login_required_ajax
-    def add_GC(self, request):
-        """ Adding New GC """
-        if user_has_privilege(request.user.profile, 'GCAdmin'):
-            participating_hostels_data = request.data.get('participating_hostels', [])
-            serializer = GCSerializer(data=request.data)
-            if serializer.is_valid():
-                gc = serializer.save()
 
-                gc.participating_hostels.set(participating_hostels_data)
-                return Response(serializer.data)
-            return Response(serializer.errors, status=400)
-        return Response({"detail": "You do not have the required permissions to add GCs."}, status=403)
+    @login_required_ajax
+    def create(self, request):
+        """ POST a new GC. 
+        Needs `AddGC` permission for each body to be associated.
+        This also creates new entries for GC_Hostel_Points for each hostel."""
+
+        # Prevent events without any body
+        if 'body' not in request.data or not request.data['body']:
+            return insufficient_parameters()
+    
+        if user_has_privilege(request.user.profile, request.data['body'], 'GCAdm'):
+            gc = super().create(request)
+            participating_hostel = request.data.getlist('participating_hostels')
+            print(request.data)
+            print(request.data['body'])
+            print(participating_hostel)
+            for hostel in participating_hostel:
+                GC_Hostel_Points.objects.create(
+                    gc=GC.objects.get(id=gc.data['id']),
+                    hostel=Hostel.objects.get(id=hostel),
+                    points=0,
+                )
+            return gc
+        return forbidden_no_privileges()
+
+        #     serializer = GCSerializer(data=request.data)
+        #     if serializer.is_valid():
+        #         gc = serializer.save()
+
+        #         gc.participating_hostels.set(participating_hostels_data)
+        #         return Response(serializer.data)
+        #     return Response(serializer.errors, status=400)
+        # return Response({"detail": "You do not have the required permissions to add GCs."}, status=403)
 
 
 class GCAdminViewSet(viewsets.ModelViewSet):

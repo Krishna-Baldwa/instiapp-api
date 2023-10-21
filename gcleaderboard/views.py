@@ -74,7 +74,7 @@ class InstiViewSet(viewsets.ModelViewSet):
             ).aggregate(Total_Points=Coalesce(Sum("points"), Value(0)))["Total_Points"]
 
             data.append({
-                "hostels": HostelSerializer(row).data,
+                "hostels": curr_hostel_name,
                 "points": Total_Points_Curr_Hostel
             })
 

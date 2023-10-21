@@ -37,9 +37,15 @@ class Hostel_PointsSerializer(serializers.ModelSerializer):
 
 
 class Hostel_Serializer(serializers.ModelSerializer):
+
+    hostel_name = serializers.SerializerMethodField()
+
+    def get_hostel_name(self, obj):
+        return obj.name
+    
     class Meta:
         model = GC_Hostel_Points
-        fields = ["points"]
+        fields = ["hostel_name"]
 
 class Participants_Serializer(serializers.ModelSerializer):
 

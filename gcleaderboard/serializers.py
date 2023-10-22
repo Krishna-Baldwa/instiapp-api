@@ -17,7 +17,7 @@ class TypeGCSerializer(serializers.ModelSerializer):
         return obj.name
 
     def get_hostels(self, obj):
-        return [obj.hostel.name for obj in GC_Hostel_Points.objects.filter(gc=obj).order_by("-points")[:3]]
+        return [obj.hostel for obj in GC_Hostel_Points.objects.filter(gc=obj).order_by("-points")[:3]]
 
     class Meta:
         model = GC_Hostel_Points

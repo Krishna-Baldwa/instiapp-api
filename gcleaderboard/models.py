@@ -22,7 +22,7 @@ class GC(models.Model):
 class GC_Hostel_Points(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     gc = models.ForeignKey(GC, on_delete=models.CASCADE)
-    hostel = models.ForeignKey(Hostel, on_delete=models.CASCADE)
+    hostel = models.ManyToManyField(Hostel)
     points = models.IntegerField(default=0)
     # participants = models.ForeignKey('users.UserProfile', null=True, on_delete=models.CASCADE)
 

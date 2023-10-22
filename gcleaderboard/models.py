@@ -13,7 +13,7 @@ class GC(models.Model):
     name = models.CharField(max_length=50)
     type = models.PositiveIntegerField(choices=TYPE_CHOICES)
     participating_hostels = models.ManyToManyField(Hostel)
-    body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE, related_name='gc_body')
+    # body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE, related_name='gc_body')
 
     def __str__(self):
         return self.name

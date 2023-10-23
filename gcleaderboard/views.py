@@ -46,7 +46,7 @@ class InstiViewSet(viewsets.ModelViewSet):
         This also has the first three rankers for every GC shown."""
 
         gcs = GC.objects.filter(type=Type)
-        serializer = TypeGCSerializer(gcs, many=True)
+        serializer = GCSerializer(gcs, many=True)
         return Response(serializer.data)
 
 

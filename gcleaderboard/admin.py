@@ -7,7 +7,7 @@ class GCLeaderboardAdmin(admin.ModelAdmin):
 
 
 class GC_Hostel_PointsAdmin(admin.ModelAdmin):
-    list_display = ("gc", "points", "id")
+    list_display = ("gc", "hostel", "points", "id")
 
 
 admin.site.register(GC, GCLeaderboardAdmin)

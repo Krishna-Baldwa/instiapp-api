@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from gcleaderboard.models import GC, GC_Hostel_Points
+from messmenu.models import Hostel
 from messmenu.serializers import HostelSerializer
 
 class GCSerializer(serializers.ModelSerializer):
@@ -14,10 +15,10 @@ class TypeGCSerializer(serializers.ModelSerializer):
     gc = serializers.SerializerMethodField()
 
     def get_gc(self, obj):
-        return obj.name
+        return GCSerializer(obj).data
 
     def get_hostels(self, obj):
-        return [obj.hostel.name for obj in GC_Hostel_Points.objects.filter(gc=obj).order_by("-points")[:3]]
+        return [Hostel_Serializer(obj.hostel).data for obj in GC_Hostel_Points.objects.filter(gc=obj).order_by("-points")[:3]]
 
     class Meta:
         model = GC_Hostel_Points
@@ -26,26 +27,21 @@ class TypeGCSerializer(serializers.ModelSerializer):
 
 class Hostel_PointsSerializer(serializers.ModelSerializer):
 
-    hostel_name = serializers.SerializerMethodField()
-
-    def get_hostel_name(self, obj):
-        return obj.hostel.name
+    hostel = serializers.SerializerMethodField()
+    
+    def get_hostel(self, obj):
+        return HostelSerializer(obj.hostel).data
 
     class Meta:
         model = GC_Hostel_Points
-        fields = ["hostel_name", "points"]
+        fields = ["hostel", "points"]
 
 
 class Hostel_Serializer(serializers.ModelSerializer):
-
-    hostel_name = serializers.SerializerMethodField()
-
-    def get_hostel_name(self, obj):
-        return obj.name
     
     class Meta:
-        model = GC_Hostel_Points
-        fields = ["hostel_name"]
+        model = Hostel
+        fields = "__all__"
 
 class Participants_Serializer(serializers.ModelSerializer):
 

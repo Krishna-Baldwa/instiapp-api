@@ -47,7 +47,7 @@ urlpatterns = [
         ),
     ),
     path(
-        "updateGC/<pk>/",
+        "update_hostel_points/<pk>/",
         GCAdminViewSet.as_view(
             {
                 "put": "update_points",
@@ -55,14 +55,14 @@ urlpatterns = [
         ),
     ),
 
-    path(
-        "participantsgc/<hostel_short_name>/<points_id>/",
-        InstiViewSet.as_view(
-            {
-                "get": "Participants_in_GC",
-            }
-        ),
-    ),
+    # path(
+    #     "participantsgc/<hostel_short_name>/<points_id>/",
+    #     InstiViewSet.as_view(
+    #         {
+    #             "get": "Participants_in_GC",
+    #         }
+    #     ),
+    # ),
 
 ]
 ############################################################################

@@ -40,7 +40,7 @@ class InstiViewSet(viewsets.ModelViewSet):
     queryset = GC.objects
     serializer_class = GCSerializer
 
-    def Type_GC(self,request,Type,):
+    def Type_GC(self,request,Type):
         """GET list of GCs for a particular type.
         As in list of all tech GCs, Cult GCs, etc.
         This also has the first three rankers for every GC shown."""
@@ -67,14 +67,14 @@ class InstiViewSet(viewsets.ModelViewSet):
         for row in all_rows:
             # Access fields of the row
             curr_hostel_id = row.id
-            curr_hostel_name = row.name
+            curr_hostel = Hostel_Serializer(row).data
 
             Total_Points_Curr_Hostel = GC_Hostel_Points.objects.filter(
                 hostel__id=curr_hostel_id, gc__type=Type
             ).aggregate(Total_Points=Coalesce(Sum("points"), Value(0)))["Total_Points"]
 
             data.append({
-                "hostels": curr_hostel_name,
+                "hostel": curr_hostel,
                 "points": Total_Points_Curr_Hostel
             })
 
@@ -96,7 +96,7 @@ class InstiViewSet(viewsets.ModelViewSet):
             ).aggregate(Total_Points=Coalesce(Sum("points"), Value(0)))["Total_Points"]
 
             data.append({
-                "hostels": HostelSerializer(row).data,
+                "hostel": HostelSerializer(row).data,
                 "points": Total_Points_Curr_Hostel
             })
 
@@ -137,7 +137,7 @@ class GCAdminPostViewSet(viewsets.ModelViewSet):
 
 class GCAdminViewSet(viewsets.ModelViewSet):
     queryset = GC_Hostel_Points.objects.all()  # Replace with your queryset
-    serializer_class = Hostel_Serializer
+    serializer_class = Hostel_PointsSerializer
 
     @login_required_ajax
     def update_points(self, request, pk):

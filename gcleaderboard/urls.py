@@ -1,5 +1,4 @@
 from django.urls import path
-from . import views
 from gcleaderboard.views import InstiViewSet, GCAdminViewSet, GCAdminPostViewSet
 
 urlpatterns = [
@@ -51,6 +50,14 @@ urlpatterns = [
         GCAdminViewSet.as_view(
             {
                 "put": "update_points",
+            }
+        ),
+    ),
+    path(
+        "get_available_hostels_bodies",
+        GCAdminPostViewSet.as_view(
+            {
+                "get": "hostels_bodies",
             }
         ),
     ),

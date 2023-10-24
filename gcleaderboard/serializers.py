@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from bodies.models import Body
 from gcleaderboard.models import GC, GC_Hostel_Points
 from messmenu.models import Hostel
 from messmenu.serializers import HostelSerializer
@@ -41,6 +42,12 @@ class Hostel_Serializer(serializers.ModelSerializer):
     
     class Meta:
         model = Hostel
+        fields = "__all__"
+
+class Body_Serializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Body
         fields = "__all__"
 
 class Participants_Serializer(serializers.ModelSerializer):

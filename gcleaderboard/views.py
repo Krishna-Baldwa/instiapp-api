@@ -4,6 +4,9 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Sum, Value
 from django.db.models.functions import Coalesce
 from rest_framework import viewsets
+
+from bodies.models import Body
+from bodies.serializers import BodySerializer
 from .models import GC, GC_Hostel_Points, Hostel
 from messmenu.serializers import HostelSerializer
 from roles.helpers import user_has_privilege
@@ -11,6 +14,7 @@ from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, insufficient_parameters
 from rest_framework.response import Response
 from .serializers import (
+    Body_Serializer,
     GCSerializer,
     Hostel_PointsSerializer,
     Hostel_Serializer,
@@ -99,11 +103,10 @@ class InstiViewSet(viewsets.ModelViewSet):
                 "hostel": HostelSerializer(row).data,
                 "points": Total_Points_Curr_Hostel
             })
-
         sorted_dict = sorted(data, key=lambda item: item["points"], reverse=True)
-
         print(sorted_dict)
         return Response(sorted_dict)
+    
     
          
 
@@ -133,6 +136,17 @@ class GCAdminPostViewSet(viewsets.ModelViewSet):
                 )
             return gc
         return forbidden_no_privileges()
+    
+
+    @login_required_ajax
+    def hostels_bodies(self, request):
+        print(request.data)
+        """GET list of all hostels and bodies"""
+        hostels = Hostel.objects.all()
+        bodies = Body.objects.all()
+        hostels_serializer = HostelSerializer(hostels, many=True)
+        bodies_serializer = Body_Serializer(bodies, many=True)
+        return Response({"hostels": hostels_serializer.data, "bodies": bodies_serializer.data})
 
 
 class GCAdminViewSet(viewsets.ModelViewSet):

@@ -124,14 +124,9 @@ class GCAdminPostViewSet(viewsets.ModelViewSet):
         # Prevent events without any body
         if 'body_id' not in request.data or not request.data['body_id']:
             return insufficient_parameters()
-        
-        print(request.data)
 
         if user_has_privilege(request.user.profile, request.data['body_id'], 'GCAdm'):
-            try:
-                gc = super().create(request)
-            except Exception as e:
-                print(e)
+            gc = super().create(request)
             participating_hostel = request.data.get('participating_hostels_id')
             for hostel in participating_hostel:
                 GC_Hostel_Points.objects.create(

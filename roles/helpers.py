@@ -22,6 +22,8 @@ def user_has_privilege(profile, bodyid, privilege):
     body = Body.objects.get(pk=bodyid)
     parents = get_parents_recursive(body, [])
     for role in profile.roles.all().filter(body__in=parents):
+        print(body)
+        print(role.body)
         if (role.body == body or role.inheritable) and privilege in role.permissions:
             return True
     return False

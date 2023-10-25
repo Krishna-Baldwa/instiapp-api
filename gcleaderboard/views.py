@@ -122,12 +122,17 @@ class GCAdminPostViewSet(viewsets.ModelViewSet):
         This also creates new entries for GC_Hostel_Points for each hostel."""
 
         # Prevent events without any body
-        if 'body' not in request.data or not request.data['body']:
+        if 'body_id' not in request.data or not request.data['body_id']:
             return insufficient_parameters()
-    
-        if user_has_privilege(request.user.profile, request.data['body'], 'GCAdm'):
-            gc = super().create(request)
-            participating_hostel = request.data.getlist('participating_hostels')
+        
+        print(request.data)
+
+        if user_has_privilege(request.user.profile, request.data['body_id'], 'GCAdm'):
+            try:
+                gc = super().create(request)
+            except Exception as e:
+                print(e)
+            participating_hostel = request.data.get('participating_hostels_id')
             for hostel in participating_hostel:
                 GC_Hostel_Points.objects.create(
                     gc=GC.objects.get(id=gc.data['id']),

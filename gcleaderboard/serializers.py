@@ -3,8 +3,15 @@ from bodies.models import Body
 from gcleaderboard.models import GC, GC_Hostel_Points
 from messmenu.models import Hostel
 from messmenu.serializers import HostelSerializer
+from bodies.serializer_min import BodySerializerMin
 
 class GCSerializer(serializers.ModelSerializer):
+    body = BodySerializerMin(read_only=True)
+    body_id = serializers.PrimaryKeyRelatedField(
+        many=False, read_only=False, queryset=Body.objects.all(), source='body')
+    participating_hostels = HostelSerializer(many=True, read_only=True)
+    participating_hostels_id = serializers.PrimaryKeyRelatedField(
+        many=True, read_only=False, queryset=Hostel.objects.all(), source='participating_hostels')
     class Meta:
         model = GC
         fields = "__all__"

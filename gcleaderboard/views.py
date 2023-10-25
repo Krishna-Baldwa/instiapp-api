@@ -160,9 +160,13 @@ class GCAdminViewSet(viewsets.ModelViewSet):
 
         gc = GC_Hostel_Points.objects.get(id=pk).gc
 
+        print(gc.body.id)
+
         if user_has_privilege(request.user.profile, gc.body.id, 'GCAdm'):
             gc_hostel_points = GC_Hostel_Points.objects.get(id=pk)
             change_point = int(request.data.get("points", 0))
             gc_hostel_points.points += change_point
             gc_hostel_points.save()
             return Response({"message": "Points updated"})
+        
+        return forbidden_no_privileges()

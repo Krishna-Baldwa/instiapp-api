@@ -42,7 +42,7 @@ class Hostel_PointsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GC_Hostel_Points
-        fields = ["hostel", "points"]
+        fields = ["hostel", "points","id"]
 
 
 class Hostel_Serializer(serializers.ModelSerializer):

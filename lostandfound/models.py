@@ -5,6 +5,9 @@ from helpers.misc import get_url_friendly
 PDT_NAME_MAX_LENGTH = 60
 CONTACT_MAX_LENGTH = 300
 
+def get_image_path(instance, filename):
+    userid = str(instance.uploaded_by.id)
+    return './' + userid[0:2] + '/' + userid[2:4] + '/' + userid + '-' + filename + '.jpg'
 
 class ProductFound(models.Model):
     CATEGORY_CHOICES = (
@@ -20,9 +23,9 @@ class ProductFound(models.Model):
     product_image = models.TextField(
         blank=True, null=True
     )  # Contains URLs of all three images.
-    product_image1 = models.ImageField(upload_to="laf_images/", null=False, blank=False)
-    product_image2 = models.ImageField(upload_to="laf_images/", null=False, blank=True)
-    product_image3 = models.ImageField(upload_to="laf_images/", null=False, blank=True)
+    product_image1 = models.ImageField(upload_to=get_image_path, null=False, blank=False)
+    product_image2 = models.ImageField(upload_to=get_image_path, null=False, blank=True)
+    product_image3 = models.ImageField(upload_to=get_image_path, null=False, blank=True)
     category = models.CharField(
         choices=CATEGORY_CHOICES, null=True, blank=True, max_length=PDT_NAME_MAX_LENGTH
     )
@@ -35,6 +38,14 @@ class ProductFound(models.Model):
         max_length=CONTACT_MAX_LENGTH, blank=False, null=False
     )
     time_of_creation = models.DateTimeField(auto_now_add=True)
+
+    uploaded_by = models.ForeignKey(
+        "users.UserProfile",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="uploaded_products",
+    )
 
     claimed_by = models.ForeignKey(
         "users.UserProfile",
@@ -75,3 +86,4 @@ class ProductFound(models.Model):
                 ]
             ),
         ]
+

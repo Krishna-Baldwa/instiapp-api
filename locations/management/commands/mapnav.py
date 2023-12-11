@@ -25,8 +25,9 @@ class handle_entry:
     Retrieves the adj_list with distances and updates the database for
     the Locations models to include node points if they are not already present.
 
-    ### Adding New Locations to the `adj_list` Dictionary:
-
+    ### Adding New Locations to the `adj_list` Dictionary using Django Shell:
+    NOTE: This process should be used to clean/update database and adj_list. Pleas use django-admin commands site adj_list is updated automatically.
+    
     To add a new location to the `adj_list` dictionary:
 
     1. Insert the new location details into the `adj_list`.
@@ -38,10 +39,11 @@ class handle_entry:
         # Create an instance of handle_entry and update the adj_list
         handle_entry_instance = handle_entry()
         handle_entry_instance.update()
-
+        handle_entry_instance.update_locations_db() #update the database with the new node points
         # Print the updated adj_list
         print(handle_entry_instance.adj_list)
     ```
+    
 
     3. This process updates the database with the new location and provides the
     modified `adj_list` dictionary.
@@ -304,9 +306,7 @@ class handle_entry:
 
     def update(self):
         '''CAUTION: Avoid executing the update function during active requests as it may cause significant delays (~20s).
-        
-        If any modifications need to be made to the adj_list, it is essential to ensure that the
-        adj_list is updated accordingly, including the distances between nodes.
+        Updates the `adj_list` dictionary with new connections and distances between locations.
     '''
         for x in self.adj_list:
             if type(x) != str:
@@ -353,8 +353,9 @@ class handle_entry:
                         if x_pix is None or y_pix is None:
                             x_pix = 0
                             y_pix = 0
-
                         self.adj_list[x][y] = m.sqrt(abs(0.001 * ((x_cor - x_pix)**2 + (y_cor - y_pix)**2)))
+
+        def update_locations_db(self):
             # Need to run this once to update the database with given new or updated node points.
             i = 0
             loc_list = []
@@ -393,8 +394,9 @@ class handle_entry:
                     pass
 
 
-    def load_adj_list(self):
-        '''Gets the nearest Node near a location on the map.'''
+    def load_adj_list(self) -> dict:
+        '''Loads the `adj_list` from file /locations/management/commands/adj_list.py.'''
+
         adj_list_path = f"{os.getcwd()}/locations/management/commands/adj_list.py"
         adj_list = {}
         with open(adj_list_path, 'r') as f:

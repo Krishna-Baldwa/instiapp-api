@@ -71,12 +71,13 @@ class LocationViewSet(viewsets.ModelViewSet):
         return super().destroy(request, pk)
 
 
-'''
-This endpoint gives the shortest path between two points on the map in a sequence of locations.
-'''
+
 
 @api_view(('POST',))
 def get_shortest_path(request):
+    '''
+    Get shortest path between two points on the map in a sequence of locations.
+    '''
 
     try:
         start = request.data['origin']
@@ -137,11 +138,12 @@ def get_shortest_path(request):
     return Response()
 
 
-'''
-Finding the nearest two points for a given set of coordinates.
-'''
+
 @api_view(("POST",))
 def nearest_points(request):
+    '''
+    Get nearest two points for a given set of coordinates.
+    '''
     xcor = request.data["xcor"]
     ycor = request.data["ycor"]
 
@@ -207,12 +209,13 @@ def nearest_points(request):
             return Response(data={"detail": "No Locations"})
 
 
-'''
-"Testing errors in the adjacency list:
-These are the errors that may occur when running the Dijkstra code. It provides common error outputs."
-'''
+
 @api_view(["GET"])
 def checkerrors(request):
+    '''
+    Test errors in the adjacency list.\\
+    Returns the errors that may occur while running the Djikstra code.
+    '''
     adj_list = handle_entry().load_adj_list()  #change this list accordingly
     #adj_list ={}
     items = {}

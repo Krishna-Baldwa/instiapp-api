@@ -20,11 +20,32 @@ import math as m
 
 # profile_fetcher = ProfileFetcher()
 
-'''
-Returns adj_list with the distances and updates database for
-Locations models to contain the node points(if they didn't).
-'''
 class handle_entry:
+    """
+    Retrieves the adj_list with distances and updates the database for
+    the Locations models to include node points if they are not already present.
+
+    ### Adding New Locations to the `adj_list` Dictionary:
+
+    To add a new location to the `adj_list` dictionary:
+
+    1. Insert the new location details into the `adj_list`.
+    2. Open the Django shell (`manage.py shell`) and execute the following commands:
+
+    ```python
+        from locations.management.commands.mapnav import handle_entry
+
+        # Create an instance of handle_entry and update the adj_list
+        handle_entry_instance = handle_entry()
+        handle_entry_instance.update()
+
+        # Print the updated adj_list
+        print(handle_entry_instance.adj_list)
+    ```
+
+    3. This process updates the database with the new location and provides the
+    modified `adj_list` dictionary.
+    """
     def __init__(self):
         self.coordinates = [[2091, 747],
                             [2189, 756],
@@ -279,13 +300,14 @@ class handle_entry:
         self.adj_list = self.load_adj_list()
 
 
-    '''Caution: Avoid executing the update function during active requests as it may cause significant delays (~20s).
-    If any modifications need to be made to the adj_list, it is essential to ensure that the
-    adj_list is updated accordingly,
-    including the distances between nodes.
-    '''
+   
 
     def update(self):
+        '''CAUTION: Avoid executing the update function during active requests as it may cause significant delays (~20s).
+        
+        If any modifications need to be made to the adj_list, it is essential to ensure that the
+        adj_list is updated accordingly, including the distances between nodes.
+    '''
         for x in self.adj_list:
             if type(x) != str:
                 for y in self.adj_list[x]:
@@ -307,15 +329,12 @@ class handle_entry:
                                                   + (self.coordinates[x][1] - y_cor)**2)))
 
             else:
-                try:
-                    loc = Location.objects.filter(name=x)[0]
-                    x_cor = loc.pixel_x
-                    y_cor = loc.pixel_y
-                    if x_cor is None or y_cor is None:
-                        x_cor = 0
-                        y_cor = 0
-
-                except IndexError:
+                
+                loc = Location.objects.filter(name=x).first()
+                if loc is not None:
+                    x_cor = loc.pixel_x if loc.pixel_x else 0
+                    y_cor = loc.pixel_y if loc.pixel_y else 0
+                else:
                     x_cor = 0
                     y_cor = 0
 
@@ -351,10 +370,11 @@ class handle_entry:
                 f.write(str(self.adj_list))
 
 
-    """
-    Updates the 'connected_locs' field of Location objects with conected locations
-    """
+
     def update_locations_with_connected_loc(self):
+            """
+            Updates the `connected_locs` field of Location objects with conected locations
+            """
         # Need to run this to ensure the location objects contain the adjacent locations that they are connected to.
             all_locations = Location.objects.all()
             for location in all_locations:
@@ -372,20 +392,16 @@ class handle_entry:
                 except KeyError:
                     pass
 
-    '''Gets the nearest Node near a location on the map.'''
 
     def load_adj_list(self):
+        '''Gets the nearest Node near a location on the map.'''
         adj_list_path = f"{os.getcwd()}/locations/management/commands/adj_list.py"
         adj_list = {}
-
-        
         with open(adj_list_path, 'r') as f:
             adj_list = dict(eval(f.read()))
 
         return adj_list
 
-
-    import sys
 
     def get_nearest(self, loc):
         if "Node" in loc:
@@ -394,7 +410,6 @@ class handle_entry:
 
         min_dist = sys.maxsize
         nearest_loc = None
-
         try:
             sets = self.adj_list[loc]
             for i in sets:
@@ -408,9 +423,9 @@ class handle_entry:
         return nearest_loc
 
 
-    '''Returns the adj_list which contains only the node points containing the endpoint and the start point'''
 
     def graph(self, end, start):
+        '''Returns the adj_list which contains only the node points containing the endpoint and the start point'''
         new_adjoint_list = {}
         for i in self.adj_list:
             if isinstance(i, int) or i == start or i == end:
@@ -497,8 +512,9 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('External Blog Chore completed successfully'))
 
 
-''' This command gets the nearest points for some x,y coordinates. Although a simliar function is defined in views.py'''
+
 def fn_nearest_points(request):
+    ''' This command gets the nearest points for some x,y coordinates. Although a simliar function is defined in `views.py`'''
     xcor = request.data2["xcor"]
     ycor = request.data2["ycor"]
 

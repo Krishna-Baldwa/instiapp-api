@@ -2,6 +2,9 @@ import os
 import math as m
 
 class UpdateAdjList:
+    """
+    Utility class for updating the adjacency list with new connections and distances between locations.
+    """
     def __init__(self):
         self.adj_list = self.load_adj_list()
         self.adj_list_path = f"{os.getcwd()}/locations/management/commands/adj_list.py"
@@ -10,7 +13,6 @@ class UpdateAdjList:
         adj_list_path = f"{os.getcwd()}/locations/management/commands/adj_list.py"
         adj_list = {}
 
-        
         with open(adj_list_path, 'r') as f:
             adj_list = dict(eval(f.read()))
 
@@ -33,10 +35,12 @@ class UpdateAdjList:
 
         return m.sqrt(0.001 * ((x_loc1 - x_loc2)**2 + (y_loc1 - y_loc2)**2))
     
-    """
-    This function updates the adj_list with the new connections and distances betweem them.
-    """
+    
     def add_conns(self,loc1, connections=[]):
+        """
+        Updates the adjacency list (`adj_list`) by adding new connections and calculating distances between them.
+        """
+
         new_data = self.adj_list.copy()
         for loc2 in connections:
             if loc2:

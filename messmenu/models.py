@@ -2,10 +2,8 @@
 from uuid import uuid4
 from django.db import models
 
-
 class Hostel(models.Model):
     """Entry for each hostel."""
-
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=40, blank=True)
     short_name = models.CharField(max_length=25, blank=True)
@@ -18,24 +16,22 @@ class Hostel(models.Model):
     class Meta:
         ordering = ("name",)
 
-
 class MenuEntry(models.Model):
     """Menu entries for a single day-hostel pair."""
-
     # Meta
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    hostel = models.ForeignKey(Hostel, on_delete=models.CASCADE, related_name="mess")
+    hostel = models.ForeignKey(Hostel, on_delete=models.CASCADE, related_name='mess')
     day = models.IntegerField()
 
     # Menu
-    breakfast = models.TextField(blank=True)
-    lunch = models.TextField(blank=True)
-    snacks = models.TextField(blank=True)
-    dinner = models.TextField(blank=True)
-
+    breakfast = models.TextField(blank = True)
+    lunch = models.TextField(blank = True)
+    snacks = models.TextField(blank = True)
+    dinner = models.TextField(blank = True)
+    last_updated = models.TextField(blank = True)
+    
     def __str__(self):
-        return self.hostel.name + " - " + str(self.day)
-
+        return self.hostel.name + ' - ' + str(self.day)
 
 class MessCalEvent(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
@@ -43,7 +39,10 @@ class MessCalEvent(models.Model):
     datetime = models.DateTimeField()
     title = models.CharField(max_length=100)  # Breakfast, Lunch, Snacks, Dinner
     user = models.ForeignKey(
-        "users.UserProfile", on_delete=models.CASCADE, default=uuid4, related_name="ums"
+        'users.UserProfile',
+        on_delete=models.CASCADE,
+        default=uuid4,
+        related_name='ums'
     )
 
     def __str__(self):

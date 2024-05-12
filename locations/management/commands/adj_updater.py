@@ -33,11 +33,10 @@ class UpdateAdjList:
 
         return m.sqrt(0.001 * ((x_loc1 - x_loc2) ** 2 + (y_loc1 - y_loc2) ** 2))
 
-    """
-    This function updates the adj_list with the new connections and distances betweem them.
-    """
 
     def add_conns(self, loc1, connections=[]):
+
+        """This function updates the adj_list with the new connections and distances betweem them."""
         new_data = self.adj_list.copy()
         for loc2 in connections:
             if loc2:
